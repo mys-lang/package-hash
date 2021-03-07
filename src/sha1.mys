@@ -20,8 +20,7 @@ class Sha1:
 
         """
 
-        digest = (b"\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"
-                  b"\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00")
+        digest = bytes(20)
 
         c"sha1_digest(&m_hasher, digest.m_bytes->data());"
 
@@ -38,7 +37,7 @@ def sha1(data: bytes) -> bytes:
     """Returns the hash of given data.
 
     """
-    
+
     hasher = Sha1()
     hasher.update(data)
 
