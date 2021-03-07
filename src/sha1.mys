@@ -1,0 +1,104 @@
+c"""header-before-namespace
+#include "../../src/hash/sha1.hpp"
+"""
+
+class Sha1:
+    c"struct sha1_t m_hasher;"
+
+    def __init__(self):
+        c"sha1_init(&m_hasher);"
+
+    def update(self, data: bytes):
+        c"""
+        sha1_update(&m_hasher, data.m_bytes->data(), data.m_bytes->size());
+        """
+
+    def digest(self) -> bytes:
+        digest = (b"\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"
+                  b"\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00")
+
+        c"""
+        sha1_digest(&m_hasher, digest.m_bytes->data());
+        """
+
+        return digest
+
+    def reset(self):
+        c"sha1_init(&m_hasher);"
+
+def sha1(data: bytes) -> bytes:
+    hasher = Sha1()
+    hasher.update(data)
+
+    return hasher.digest()
+
+@test
+def test_vectors():
+    datas = [
+        (
+            b"",
+            b"\xda\x39\xa3\xee\x5e\x6b\x4b\x0d\x32\x55"
+            b"\xbf\xef\x95\x60\x18\x90\xaf\xd8\x07\x09"
+        ),
+        (
+            b"abc",
+            b"\xa9\x99\x3e\x36\x47\x06\x81\x6a\xba\x3e"
+            b"\x25\x71\x78\x50\xc2\x6c\x9c\xd0\xd8\x9d"
+        ),
+        (
+            b"The quick brown fox jumps over the lazy dog",
+            b"\x2f\xd4\xe1\xc6\x7a\x2d\x28\xfc\xed\x84"
+            b"\x9e\xe1\xbb\x76\xe7\x39\x1b\x93\xeb\x12"
+        ),
+        (
+            b"The quick brown fox jumps over the lazy cog",
+            b"\xde\x9f\x2c\x7f\xd2\x5e\x1b\x3a\xfa\xd3"
+            b"\xe8\x5a\x0b\xd1\x7d\x9b\x10\x0d\xb4\xb3"
+        ),
+        (
+            b"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            b"\x13\xd9\x56\x03\x3d\x9a\xf4\x49\xbf\xe2"
+            b"\xc4\xef\x78\xc1\x7c\x20\x46\x9c\x4b\xf1"
+        ),
+        (
+            b"abcdefghbcdefghicdefghijdefghijkefghijklfgh"
+            b"ijklmghijklmnhijklmnoijklmnopjklmnopqklmnop"
+            b"qrlmnopqrsmnopqrstnopqrstu",
+            b"\xa4\x9b\x24\x46\xa0\x2c\x64\x5b\xf4\x19"
+            b"\xf9\x95\xb6\x70\x91\x25\x3a\x04\xa2\x59"
+        )
+    ]
+
+    for data, hashed in datas:
+        hasher = Sha1()
+        hasher.update(data)
+        assert hasher.digest() == hashed
+
+    for data, hashed in datas:
+        assert sha1(data) == hashed
+
+@test
+def test_multiple_updates():
+    hasher = Sha1()
+
+    for i in range(400):
+        hasher.update(b"1")
+
+    assert hasher.digest() == (b"\x7f\xdd\xab\x82\x28\xdf\x0f\x39\x77\xed"
+                               b"\xf7\x3b\xb8\x06\x86\x11\x59\xad\x89\xd1")
+
+@test
+def test_reset():
+    data = b"The quick brown fox jumps over the lazy dog"
+    hashed = (b"\x2f\xd4\xe1\xc6\x7a\x2d\x28\xfc\xed\x84"
+              b"\x9e\xe1\xbb\x76\xe7\x39\x1b\x93\xeb\x12")
+
+    hasher = Sha1()
+
+    hasher.update(data)
+    hasher.update(data)
+    assert hasher.digest() != hashed
+
+    hasher.reset()
+    hasher.update(data)
+    assert hasher.digest() == hashed
