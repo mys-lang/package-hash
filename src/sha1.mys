@@ -9,11 +9,19 @@ class Sha1:
         c"sha1_init(&m_hasher);"
 
     def update(self, data: bytes):
+        """Update the hash with given data.
+
+        """
+
         c"""
         sha1_update(&m_hasher, data.m_bytes->data(), data.m_bytes->size());
         """
 
     def digest(self) -> bytes:
+        """Returns the hash.
+
+        """
+
         digest = (b"\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"
                   b"\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00")
 
@@ -24,6 +32,10 @@ class Sha1:
         return digest
 
     def reset(self):
+        """Reset the hasher state.
+
+        """
+
         c"sha1_init(&m_hasher);"
 
 def sha1(data: bytes) -> bytes:
