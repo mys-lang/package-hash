@@ -27,10 +27,10 @@ Multiple (or single) buffers.
    from hash.sha1 import Sha1
 
    def main():
-       h = Sha1()
-       h.update(b"The quick brown fox jumps")
-       h.update(b" over the lazy dog")
-       print(h.digest())
+       hasher = Sha1()
+       hasher.update(b"The quick brown fox jumps")
+       hasher.update(b" over the lazy dog")
+       print(hasher.digest())
 
 Functions and types
 ===================
