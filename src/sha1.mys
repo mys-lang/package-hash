@@ -39,6 +39,10 @@ class Sha1:
         c"sha1_init(&m_hasher);"
 
 def sha1(data: bytes) -> bytes:
+    """Returns the hash of given data.
+
+    """
+    
     hasher = Sha1()
     hasher.update(data)
 
