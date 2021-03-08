@@ -36,14 +36,15 @@ static inline uint32_t rotateleft(uint32_t value, int positions)
     return ((value << positions) | (value >> (32 - positions)));
 }
 
-static void block_update(struct sha1_t *self_p,
-                         uint8_t *block_p)
+static void block_update(struct sha1_t *self_p)
 {
-    uint32_t a ,b ,c ,d ,e, f, i ,t ,w[80];
-    uint32_t *b_p = (uint32_t *)block_p;
+    uint32_t a, b, c, d, e, f, i ,t, w[80];
 
-    for (i = 0; i < 16; i++) {
-        w[i] = ntohl(b_p[i]);
+    for (i = 0; i < 64; i += 4) {
+        w[i / 4] = ((self_p->block.buf[i + 0] << 24)
+                    | (self_p->block.buf[i + 1] << 16)
+                    | (self_p->block.buf[i + 2] << 8)
+                    | (self_p->block.buf[i + 3] << 0));
     }
 
     for (i = 16; i < 80; i++) {
@@ -117,11 +118,10 @@ int sha1_init(struct sha1_t *self_p)
 }
 
 int sha1_update(struct sha1_t *self_p,
-                void *buf_p,
-                size_t size)
+                uint8_t *buf_p,
+                uint32_t size)
 {
     uint32_t temp;
-    uint8_t *b_p = (uint8_t *)buf_p;
 
     self_p->size += size;
 
@@ -129,25 +129,25 @@ int sha1_update(struct sha1_t *self_p,
     if (self_p->block.size > 0) {
         if ((self_p->block.size + size) >= 64) {
             temp = (64 - self_p->block.size);
-            memcpy(&self_p->block.buf[self_p->block.size], b_p, temp);
+            memcpy(&self_p->block.buf[self_p->block.size], buf_p, temp);
             size -= temp;
-            b_p += temp;
-            block_update(self_p, self_p->block.buf);
+            buf_p += temp;
+            block_update(self_p);
             self_p->block.size = 0;
         }
     }
 
     /* Main loop. */
     while (size >= 64) {
-        memcpy(&self_p->block.buf[0], b_p, 64);
-        block_update(self_p, self_p->block.buf);
+        memcpy(&self_p->block.buf[0], buf_p, 64);
+        block_update(self_p);
         size -= 64;
-        b_p += 64;
+        buf_p += 64;
     }
 
     /* Epilogue: Save left over block in buffer. */
     if (size > 0) {
-        memcpy(&self_p->block.buf[self_p->block.size], b_p, size);
+        memcpy(&self_p->block.buf[self_p->block.size], buf_p, size);
         self_p->block.size += size;
     }
 
@@ -175,7 +175,7 @@ int sha1_digest(struct sha1_t *self_p,
             memset(&self_p->block.buf[i], 0, 64 - i);
         }
 
-        block_update(self_p, self_p->block.buf);
+        block_update(self_p);
         memset(self_p->block.buf, 0, 56);
     }
 
@@ -184,14 +184,12 @@ int sha1_digest(struct sha1_t *self_p,
         self_p->block.buf[56 + i] = ((8 * self_p->size) >> (56 - 8 * i));
     }
 
-    block_update(self_p, self_p->block.buf);
+    block_update(self_p);
 
     /* Copy the hash to the output buffer. */
-    for (i = 0; i < 5; i++) {
-        self_p->h[i] = htonl(self_p->h[i]);
+    for (i = 0; i < 20; i++) {
+        hash_p[i] = self_p->h[i / 4] >> (24 - 8 * i);
     }
-
-    memcpy(hash_p, self_p->h, 20);
 
     return (0);
 }

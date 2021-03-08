@@ -29,8 +29,6 @@
 #pragma once
 
 #include <stdint.h>
-#include <unistd.h>
-#include <arpa/inet.h>
 
 namespace mys::hash::sha1 {
 
@@ -64,8 +62,8 @@ int sha1_init(struct sha1_t *self_p);
  * @return zero(0) or negative error code.
  */
 int sha1_update(struct sha1_t *self_p,
-                void *buf_p,
-                size_t size);
+                uint8_t *buf_p,
+                uint32_t size);
 
 /**
  * Return the digest of the strings passed to the sha1_update()
