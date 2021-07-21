@@ -34,8 +34,8 @@ Multiple (or single) buffers.
        hasher.update(b" over the lazy dog")
        print(hasher.digest())
 
-Functions and types
-===================
+API
+===
 
 SHA-1
 -----
