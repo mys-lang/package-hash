@@ -113,3 +113,7 @@ def test_reset():
     hasher.reset()
     hasher.update(data)
     assert hasher.digest() == hashed
+
+@test
+def test_str():
+    assert str(b"\x31\x32\x33") == "b\"\\x31\\x32\\x33\""

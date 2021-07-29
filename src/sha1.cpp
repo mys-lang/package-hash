@@ -188,7 +188,7 @@ int sha1_digest(struct sha1_t *self_p,
 
     /* Copy the hash to the output buffer. */
     for (i = 0; i < 20; i++) {
-        hash_p[i] = self_p->h[i / 4] >> (24 - 8 * i);
+        hash_p[i] = self_p->h[i / 4] >> (24 - 8 * (i % 4));
     }
 
     return (0);
