@@ -5,17 +5,17 @@ c"""header-before-namespace
 class Sha1:
     c"struct sha1_t m_hasher;"
 
-    def __init__(self):
+    func __init__(self):
         c"sha1_init(&m_hasher);"
 
-    def update(self, data: bytes):
+    func update(self, data: bytes):
         """Update the hash with given data.
 
         """
 
         c"sha1_update(&m_hasher, data.m_bytes->data(), data.m_bytes->size());"
 
-    def digest(self) -> bytes:
+    func digest(self) -> bytes:
         """Returns the hash.
 
         """
@@ -26,14 +26,14 @@ class Sha1:
 
         return digest
 
-    def reset(self):
+    func reset(self):
         """Reset the hasher state.
 
         """
 
         c"sha1_init(&m_hasher);"
 
-def sha1(data: bytes) -> bytes:
+func sha1(data: bytes) -> bytes:
     """Returns the hash of given data.
 
     """
@@ -44,7 +44,7 @@ def sha1(data: bytes) -> bytes:
     return hasher.digest()
 
 @test
-def test_vectors():
+func test_vectors():
     datas = [
         (
             b"",
@@ -89,7 +89,7 @@ def test_vectors():
         assert sha1(data) == hashed
 
 @test
-def test_multiple_updates():
+func test_multiple_updates():
     hasher = Sha1()
 
     for i in range(400):
@@ -99,7 +99,7 @@ def test_multiple_updates():
                                b"\xf7\x3b\xb8\x06\x86\x11\x59\xad\x89\xd1")
 
 @test
-def test_reset():
+func test_reset():
     data = b"The quick brown fox jumps over the lazy dog"
     hashed = (b"\x2f\xd4\xe1\xc6\x7a\x2d\x28\xfc\xed\x84"
               b"\x9e\xe1\xbb\x76\xe7\x39\x1b\x93\xeb\x12")
@@ -115,5 +115,5 @@ def test_reset():
     assert hasher.digest() == hashed
 
 @test
-def test_str():
+func test_str():
     assert str(b"\x31\x32\x33") == "b\"\\x31\\x32\\x33\""

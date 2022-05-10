@@ -24,7 +24,7 @@ The code:
 
    from hash.sha1 import sha1
 
-   def main():
+   func main():
        print(sha1(b"The quick brown fox jumps over the lazy dog"))
 
 Build and run:
@@ -45,7 +45,7 @@ The code:
 
    from hash.sha1 import Sha1
 
-   def main():
+   func main():
        hasher = Sha1()
        hasher.update(b"The quick brown fox jumps")
        hasher.update(b" over the lazy dog")
