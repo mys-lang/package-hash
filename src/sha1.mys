@@ -43,8 +43,7 @@ func sha1(data: bytes) -> bytes:
 
     return hasher.digest()
 
-@test
-func test_vectors():
+test vectors():
     datas = [
         (
             b"",
@@ -88,8 +87,7 @@ func test_vectors():
     for data, hashed in datas:
         assert sha1(data) == hashed
 
-@test
-func test_multiple_updates():
+test multiple_updates():
     hasher = Sha1()
 
     for i in range(400):
@@ -98,8 +96,7 @@ func test_multiple_updates():
     assert hasher.digest() == (b"\x7f\xdd\xab\x82\x28\xdf\x0f\x39\x77\xed"
                                b"\xf7\x3b\xb8\x06\x86\x11\x59\xad\x89\xd1")
 
-@test
-func test_reset():
+test reset():
     data = b"The quick brown fox jumps over the lazy dog"
     hashed = (b"\x2f\xd4\xe1\xc6\x7a\x2d\x28\xfc\xed\x84"
               b"\x9e\xe1\xbb\x76\xe7\x39\x1b\x93\xeb\x12")
